@@ -1,0 +1,227 @@
+\documentclass{beamer}
+%\usetheme{beaver}
+%\usecolortheme{Madrid}
+\usetheme{Warsaw}
+%\usecolortheme{dolphin}
+\usepackage[utf8x]{inputenc}
+\usepackage{default}
+\setbeamercovered{transparent}
+%\usepackage{graphicx}
+%\usepackage{graphics}
+\title{MeraMap}
+\subtitle{Fast Track Deployment of customized OSM Tile Server}
+\author[Guru Nanak Dev Engineering College] {Parveen Arora \linebreak Dept. of Information Technology \linebreak \linebreak}
+%\institution{}
+\date{\today}
+
+\begin{document}
+\bfseries
+\frame{\titlepage}
+
+\begin{frame}
+  \frametitle{Outline}
+  \tableofcontents[pausesections,section,subsection]
+\end{frame}
+
+\section{Introduction}
+\subsection{Introduction To Openstreet Maps}
+\begin{frame}  
+\frametitle{Introduction To Openstreet Maps}
+\begin{block}{Openstreet Maps}
+OpenStreetMap is the editable World map of everything. It is the Wikipedia of maps. It is to other on-line maps as Wikipedia is to Britannica. And it is awesome in every possible way.
+\end{block}
+\pause
+\begin{block}{}
+OpenStreetMap makes the data and the software available to you with Free Software and free data licenses so that you can use, learn from, teach with, improve upon and share with others what you gain from OpenStreetMap. And you can build your own local copy of OpenStreetMap for your business, school, community group or personal interests.
+\end{block}
+\end{frame}
+
+\subsection{Why to Build Map for own?}
+\begin{frame}  
+\frametitle{Why to Build Map for own?}
+\begin{block}{Why indeed}
+OpenStreetMap.org is already freely available on the internet. Why not just use that? You can and you should. Eventually you may come up with an idea. You might want to make the map work a little differently for you. You might want a map for a special purpose.
+\end{block}
+\pause
+\begin{block}{Example}
+www.opencyclemap.org OpenCycleMap is a wonderful example of what you can do with the tools and data of OpenStreetMap catalyzed by an idea.OpenCycleMap uses OpenStreetMap data, then displays it in a way that is useful to cyclists with the emphasis placed on cycle trails, bike shops and bike parking
+\end{block}
+\end{frame}
+
+\section{Prerequisites}
+\subsection{Hardware requirements}
+\begin{frame}
+\frametitle{Hardware requirements}
+\begin{block}{Bare minimum hardware requirements}
+\begin{itemize}
+\pause
+\item RAM: 1 GB
+\pause
+\item Disk: 200 GB
+\end{itemize}
+\end{block}
+\pause
+\begin{block}{Recommended minimum hardware requirements}
+\begin{itemize}
+\pause
+\item RAM: 4 GB
+\pause
+\item Disk: 1 TB
+\end{itemize}
+\end{block}
+\pause
+\begin{block}{Potential production hardware requirements}
+\begin{itemize}
+\pause
+\item RAM: 64 GB
+\pause
+\item Disk: Many TB of 15,000 RPM RAID
+\end{itemize}
+\end{block}
+\end{frame}
+
+\section{Server Setup}
+\subsection{Setting up of own Server}
+\begin{frame}
+\frametitle{Setting up of own Server}
+\begin{block}{Creating tiles using Mapnik and generate\_tiles.py}
+This is the method used by, for example, the OSM cycle map. Its main advantage is that nothing needs to run on the webserver - it just needs a directory of image files. So, for example, you can install all the software on your home PC, and transfer the tiles to your webhost when you're finished.
+\end{block}
+\end{frame}
+
+\begin{frame}
+\frametitle{Setting up of own Server}
+\begin{block}{Procedure}
+\begin{itemize}
+\pause
+\item Download the planet file from planet.openstreetmap.org
+\pause
+\item Import into a PostGIS database using osm2pgsql
+\pause
+\item Set up mapnik and test using osm.xml and the generate\_image.py
+\pause
+\item When everything works, use generatetiles.py to create 1000s of tiles in a special hierarchy of folders
+\pause
+\item Copy/move tiles into your webserver's document root.
+\pause
+\item Change the OpenLayers instance to use your own tileserver instead of the main one
+\end{itemize}
+\end{block}
+\end{frame}
+
+\section{Installation Terms}
+\subsection{PostGIS}
+\begin{frame}
+\frametitle{PostGIS}
+\begin{block}{Why to use PostGIS}
+PostGIS is an extension for the PostgreSQL database. PostgreSQL already has geometry types. PostGIS adds geospatial functions and two metadata tables which makes it pretty easy to handle spatial data in the database.
+\end{block}
+\pause
+\begin{block}{}
+In the OSM project PostGIS is used for creating maps with Mapnik, many other people also use PostGIS for other tasks. The central OSM database was a MySQL database until API 0.5, since API 0.6 it is a PostgreSQL database, but currently not using the PostGIS extension.
+\end{block}
+\end{frame}
+
+\subsection{osm2pgsql}
+\begin{frame}
+\frametitle{osm2pgsql}
+\begin{block}{osm2pgsql}
+osm2pgsql is a utility program that converts OpenStreetMap (.OSM) data into a format that can be loaded into PostgreSQL. It is often used to render OSM data visually using Mapnik, as Mapnik can query PostgreSQL for map data, but does not work directly with OSM files.
+\end{block}
+\pause
+\begin{block}{}
+osm2pgsql is a lossy conversion utility. It only adds features that have certain tags, as defined in the config file, and it converts nodes and ways to linestrings and polygons. This means that you can't tell which linestring is connected to which, but for rendering a map that's not important
+\end{block}
+\end{frame}
+
+\subsection{Mapnik}
+\begin{frame}
+\frametitle{Mapnik}
+\begin{block}{What is Mapnik}
+Mapnik is the software we use to render the main Slippy Map layer for OSM, along with other layers such as the "cycle map" layer and "noname" layer. It is also the name given to the main layer, so things get a bit confusing sometimes.
+\end{block}
+\pause
+\begin{block}{}
+Mapnik is a open source toolkit for rendering maps. It's written in C++ and includes high-level Python bindings. It can read ESRI shapefiles, PostGIS, TIFF rasters, .osm files, any GDAL or OGR supported formats.
+\end{block}
+\end{frame}
+
+
+\subsection{PostGIS with Mapnik}
+\begin{frame}
+\frametitle{PostGIS with Mapnik}
+\begin{block}{Use of PostGIS with Mapnik}
+The Mapnik renderer uses a PostGIS database as data source. OSM data is imported into PostGIS using the Osm2pgsql program.
+ It contains the tables planet\_osm\_point, planet\_osm\_line, planet\_osm\_polygon for point, line and polygon features, respectively.In addition there is a table planet\_osm\_roads for some line features just shown on some zoom levels.  Not all OSM data ends up in the database!
+\end{block}
+\end{frame}
+
+\subsection{Osmosis}
+\begin{frame}
+\frametitle{Osmosis}
+\begin{block}{Osmosis for OSM Data Handling}
+Osmosis is a command line Java application for processing OSM data. It has components for reading from database and from file, components for writing to database and to file, components for deriving and applying change sets to data sources, components for sorting data, etc
+\end{block}
+\pause
+\begin{block}{For Example:}
+\begin{itemize}
+\pause
+\item Generate planet dumps from a database.
+\pause
+\item Load planet dumps into a database.
+\pause
+\item Compare two planet files and produce a change set.
+\pause
+\item Re-sort the data contained in planet files.
+\end{itemize}
+\end{block}
+\end{frame}
+
+\newpage
+\section{MeraMap}
+\subsection{Objective}
+\begin{frame}
+\frametitle{Objective of MeraMap}
+\begin{block}{Fast Track Deployment of OSM Tile Server}
+Fast Track Deployment of Customised OSM Tile Server" is a Google Summer of Code/2011 project by Parveen Arora also named as Mera Map at the early design stage. It will be one complete package that will automatically install all the components required to set up your own customised server which will update automatically with sync. of OpenStreetMap data for an area specified by implementor, It will also suggest him/her and will also give a option to choose default options i.e weekly bases , with easy user interface and browser based customisation of Map Style, adding of Icons, local language and additional search feature.
+\end{block}
+\end{frame}
+
+
+
+\newpage
+\subsection{MeraMap}
+\frametitle{MeraMap Working Model} 
+\begin{figure}
+\label{imag}
+\centering
+\includegraphics[scale=0.16]{OSMWorkingModel.jpg}
+\end{figure}
+
+\newpage
+\subsection{End User Interface}
+\begin{figure}
+\frametitle{MeraMap Working Model}
+\label{imag}
+\centering
+\includegraphics[scale=0.2]{EndUserInterface.jpg}
+\end{figure}
+
+
+
+\begin{frame}
+ \frametitle{}
+  \centering \emph{\bfseries \textbf{\strong{{Thank You}}}} \linebreak
+  \linebreak
+  \linebreak
+  Openstreet Map Server \linebreak
+  Parveen Arora \linebreak
+  www.parveenarora.in \linebreak 
+  \linebreak
+  \texttt{Presentation made with \LaTeX{}}
+  
+\end{frame}
+
+
+\end{document}
+
